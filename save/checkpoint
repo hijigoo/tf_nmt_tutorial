@@ -1,0 +1,2 @@
+model_checkpoint_path: "beamsearch.ckpt"
+all_model_checkpoint_paths: "beamsearch.ckpt"
