@@ -1,5 +1,6 @@
 # NMT Tutorial
 ##### Neural Machine Translation 를 간단한 코드로 작성했습니다.
+	* [NMT Tutorial](https://github.com/tensorflow/nmt)
 
 ## 0. basic_model
 가장 기본이 되는 seq2seq 모델을 작성했습니다.
