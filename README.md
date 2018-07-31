@@ -1,5 +1,5 @@
 # Tensorflow nmt tutorial
-##### Tensorflow nmt tutorial 에 나오는 모델을 간단하게 구현했습니다.
+##### Tensorflow nmt tutorial 에 나오는 모델을 간단한 버전으로 구현했습니다.
 <https://github.com/tensorflow/nmt>
 
 
