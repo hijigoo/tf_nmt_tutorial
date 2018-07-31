@@ -1,7 +1,7 @@
 # Tensorflow nmt tutorial
 ##### Tensorflow nmt tutorial 를 간단한 코드로 작성했습니다.
 <https://github.com/tensorflow/nmt>
-
+---------------
 
 
 ## 0. basic_model
