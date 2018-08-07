@@ -7,9 +7,11 @@ import tensorflow as tf
 import tflearn
 import numpy as np
 import re
+import csv
 
+from tensorflow.python.platform import gfile
+from sklearn.utils.extmath import softmax
 from sklearn.utils import shuffle
-from reader import load_csv, VocabDict
 
 TOKENIZER_RE = re.compile(r"[A-Z]{2,}(?![a-z])|[A-Z][a-z]+(?=[A-Z])|[\'\w\-]+", re.UNICODE)
 MAXLEN = 30
@@ -143,14 +145,26 @@ class SelfAttenModel(object):
             self.correct_pred = tf.equal(self.predict, self.labels)
             self.accuracy = tf.reduce_mean(tf.cast(self.correct_pred, tf.float32))
             
-            
+
+def load_csv(filepath, target_column=-1, data_column=None, has_header=False):
+    with gfile.Open(filepath) as csv_file:
+        data_file = csv.reader(csv_file)
+        if has_header:
+            header = next(data_file)
+
+        data, target = [], []
+        for i, row in enumerate(data_file):
+            data.append([_d for _i, _d in enumerate(row) if _i == data_column])
+            target.append([int(_d) for _i, _d in enumerate(row) if _i == target_column])
+
+        return data, target
 
 def token_parse(iterator):
     for value in iterator:
         return TOKENIZER_RE.findall(value)
 
-def string_parser(arr, fit):
-    tokenizer = tflearn.data_utils.VocabularyProcessor(MAXLEN, tokenizer_fn=lambda tokens: [token_parse(x) for x in tokens])
+
+def string_parser(arr, tokenizer, fit):
     if fit == False:
         return list(tokenizer.transform(arr)), tokenizer
     else:
@@ -161,27 +175,33 @@ def main():
     is_training = False
     
     # Preparing data
-    label_dict = VocabDict()
-    sources, labels = load_csv('./data/ag_news_csv/train.csv', target_columns=[0], columns_to_ignore=[1], target_dict=label_dict)
-    sources, vocab_processor = string_parser(sources, fit=True)
+    tokenizer = tflearn.data_utils.VocabularyProcessor(MAXLEN, tokenizer_fn=lambda tokens: [token_parse(x) for x in tokens])
+    sources_raw, labels = load_csv('./data/ag_news_csv/train.csv', target_column=0, data_column=2)
+    sources, vocab_processor = string_parser(sources_raw, tokenizer, fit=True)
     sources = tflearn.data_utils.pad_sequences(sources, maxlen=MAXLEN)
-    labels = np.argmax(labels, -1)
-    
+    labels = np.squeeze(labels)
+        
     sources, labels = shuffle(sources, labels)
     vocab_size = len(vocab_processor.vocabulary_._mapping)
-    label_num = label_dict.size()
+    label_num = int(np.max(labels) + 1)
     
-    # Training options
-    batch_size = 128
+    # Training options 
+    epoch_nums = 1
+    batch_size = 80
     total = len(sources)
     step_nums = int(total/batch_size)
     display_step = int(step_nums / 100)
-
-    epoch_nums = 1
-    
+     
+    if is_training == True:
+        keep_prob = 0.8
+    else:
+        keep_prob = 1.0
+        
     model = SelfAttenModel(batch_size=batch_size,
                            vocab_size=vocab_size,
                            label_num=label_num,
+                           keep_prob=keep_prob,
+                           learning_rate=0.01,
                            p_coef=0.25,
                            max_sequence_length=MAXLEN)
     
@@ -207,48 +227,74 @@ def main():
                     batch_end = batch_start + batch_size
                     batch_sources, batch_labels = (sources[batch_start:batch_end], labels[batch_start:batch_end])
 
-                    loss, accuracy, _= sess.run([model.loss, model.accuracy, model.optimizer], 
+                    loss, accuracy, predict, _= sess.run([model.loss, model.accuracy, model.predict, model.optimizer], 
                                                 feed_dict={model.sources: batch_sources, 
                                                            model.labels: batch_labels})
                     display_loss.append(loss)
                     display_accuracy.append(accuracy)
 
                     if (step % display_step) == 0:
-                        # Calculate batch accuracy & loss
+                        
                         print("Step " + str(step * batch_size) + ", Minibatch Loss= " +                               "{:.6f}".format(np.mean(display_loss)) + ", Training Accuracy= " +                               "{:.5f}".format(np.mean(display_accuracy)))
-
+                        
                         display_loss.clear()
                         display_accuracy.clear()
 
                         saver.save(sess, SAVE_FILE_PATH)
+                        
+                        test_sources_raw, test_labels = load_csv('./data/ag_news_csv/test.csv', target_column=0, data_column=2)
+                        test_sources, vocab_processor = string_parser(test_sources_raw, tokenizer, fit=True)
+                        test_sources = tflearn.data_utils.pad_sequences(test_sources, maxlen=MAXLEN)
+                        test_labels = np.squeeze(test_labels)
+
+                        test_total = len(test_sources)
+                        test_step_nums = int(test_total/batch_size)
+
+                        accuracy_list = []
+                        for step in range(test_step_nums):
+
+                            batch_start = step * batch_size
+                            batch_end = batch_start + batch_size
+                            batch_sources, batch_labels = (test_sources[batch_start:batch_end], test_labels[batch_start:batch_end])
+
+                            A, accuracy = sess.run([model.A, model.accuracy], 
+                                                                feed_dict={model.sources: batch_sources,
+                                                                           model.labels: batch_labels})
+                            accuracy_list.append(accuracy)
+
+                        print("Test Accuracy: {:.5f}".format(np.mean(accuracy_list)))
 
             print("Optimization Finished!")
         
         # test mode
         else:
             
-            label_dict = VocabDict()
-            sources, labels = load_csv('./data/ag_news_csv/test.csv', target_columns=[0], columns_to_ignore=[1], target_dict=label_dict)
-            sources, vocab_processor = string_parser(sources, fit=True)
-            sources = tflearn.data_utils.pad_sequences(sources, maxlen=MAXLEN)
-            labels = np.argmax(labels, -1)
+            test_sources_raw, test_labels = load_csv('./data/ag_news_csv/test.csv', target_column=0, data_column=2)
+            test_sources, vocab_processor = string_parser(test_sources_raw, tokenizer, fit=True)
+            test_sources = tflearn.data_utils.pad_sequences(test_sources, maxlen=MAXLEN)
+            test_labels = np.squeeze(test_labels)
+            
+            test_total = len(test_sources)
+            test_step_nums = int(test_total/batch_size)
+    
+            accuracy_list = []
+            step = 0 #for step in range(test_step_nums):
+    
+            batch_start = step * batch_size
+            batch_end = batch_start + batch_size
+            batch_sources, batch_labels = (test_sources[batch_start:batch_end], test_labels[batch_start:batch_end])
 
-            batch_sources = sources[0:batch_size]
-            batch_labels = labels[0:batch_size]
-            A, accuracy, _= sess.run([model.A, model.accuracy, model.optimizer], 
+            A, accuracy = sess.run([model.A, model.accuracy], 
                                                 feed_dict={model.sources: batch_sources,
                                                            model.labels: batch_labels})
-
-            print(A[0])
-            print(accuracy)
+            accuracy_list.append(accuracy)
+            a_sum = np.sum(A, axis=0)
+            
+            print(softmax(a_sum))
+            print("Test Accuracy: {:.5f}".format(np.mean(accuracy_list)))
             
             
 if __name__ == '__main__':
     main()
     
-
-
-# In[ ]:
-
-
 
