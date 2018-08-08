@@ -4,7 +4,7 @@
 
 
 ## 0. basic_model
-\+ basic seq2seq model
+basic seq2seq model
 
 
 ## 1. embedding_model
