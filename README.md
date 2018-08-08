@@ -4,22 +4,22 @@
 
 
 ## 0. basic_model
-basic seq2seq model
+\+ basic seq2seq model
 
 
 ## 1. embedding_model
-+ embedding layer
+\+ embedding layer
 
 
 ## 2. attention_model
-+ attention connection
+\+ attention connection
 
 
 ## 3. bidirectional_model
-+ bidirectional encoder
+\+ bidirectional encoder
 
 
 ## 4. beamsearch_model
-+ beamsearch decoder
+\+ beamsearch decoder
 
 
