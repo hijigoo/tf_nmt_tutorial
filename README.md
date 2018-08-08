@@ -8,18 +8,18 @@ basic seq2seq model
 
 
 ## 1. embedding_model
-seq2seq model with embedding layer
++ embedding layer
 
 
 ## 2. attention_model
-seq2seq attention connection model
++ attention connection
 
 
 ## 3. bidirectional_model
-bidirectional encoder seq2seq model
++ bidirectional encoder
 
 
 ## 4. beamsearch_model
-beamsearch for inference
++ beamsearch decoder
 
 
