@@ -40,7 +40,7 @@ embedding_size = 12
 num_units = 12
 
 encoder_num_layer = 3
-decoder_num_layer = 1
+decoder_num_layer = 2
 
 batch_size = 3
 learning_rate = 0.0001
@@ -87,7 +87,9 @@ with tf.variable_scope('encoder'):
     encoder_outputs, encoder_final_state = tf.nn.dynamic_rnn(cell=encoder_multi_cell,
                                                              inputs=encoder_outputs,
                                                              dtype=tf.float32)
-
+    
+    encoder_final_state = [encoder_state[0]]
+    encoder_final_state.extend([state for state in encoder_final_state])
         
 with tf.variable_scope('decoder'):
     
@@ -102,7 +104,6 @@ with tf.variable_scope('decoder'):
                                                        ids=target_inputs)
     
     decoder_cell_list = [build_single_cell(num_units) for i in range(decoder_num_layer)]
-    decoder_initial_state = encoder_final_state
     
     # Attention mechanism #
     attention_mechanism = tf.contrib.seq2seq.LuongAttention(num_units=num_units, 

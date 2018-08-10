@@ -41,7 +41,7 @@ target_vocab_size = len(target_vocab)
 
 embedding_size = 12
 num_units = 12
-num_layer = 1
+num_layer = 2
 
 batch_size = 3
 learning_rate = 0.0001

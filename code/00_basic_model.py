@@ -46,7 +46,7 @@ for sen_idx in range(sen_num):
     target_input_one_hot.append(np.eye(max_vocab_size)[target_input_idx[sen_idx]])
 
 num_units = 12
-num_layer = 1
+num_layer = 2
 
 batch_size = 3
 learning_rate = 0.0002
