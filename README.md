@@ -12,13 +12,13 @@ Basic Model + Embedding Layer<br>
 
 
 ## 2. attention_model
-Basic Model + Embedding Layer + Attention Connection<br><br />
-<img src="image/2_attention.png" alt="Basic Model + Embedding Layer + Attention" width="800px"/><br />
+Basic Model + Embedding Layer + Attention Connection<br><br>
+<img src="image/2_attention.png" alt="Basic Model + Embedding Layer + Attention" width="800px"/><br>
 
 
 ## 3. bidirectional_model
-Basic Model + Embedding Layer + Attention Connection + Bidirecional Encoder<br><br />
-<img src="image/3_bidirectional.png" alt="Basic Model + Embedding Layer + Attention + Bidirecional Encoder" width="800px"/><br />
+Basic Model + Embedding Layer + Attention Connection + Bidirecional Encoder<br><br>
+<img src="image/3_bidirectional.png" alt="Basic Model + Embedding Layer + Attention + Bidirecional Encoder" width="800px"/><br>
 
 ## 4. beamsearch_model
 Basic Model + Embedding Layer + Attention Connection + Bidirecional Encoder<br>
