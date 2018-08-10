@@ -2,7 +2,7 @@
 ##### A simple implementation of [Tensorflow nmt tutorial](https://github.com/tensorflow/nmt)
 
 ## 0. basic_model
-basic seq2seq model<br>
+Basic seq2seq model<br>
 <img src="image/0_basic.png" alt="basic seq2seq model" width="800px"/>
 
 
