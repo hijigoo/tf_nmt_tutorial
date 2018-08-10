@@ -23,6 +23,6 @@ Basic Model + Embedding Layer + Attention Connection + Bidirecional Encoder<br>
 
 ## 4. beamsearch_model
 Basic Model + Embedding Layer + Attention Connection + Bidirecional Encoder<br>
-+ beamsearch decoder when inference<br>
+\+ beamsearch decoder when inference<br>
 
 
