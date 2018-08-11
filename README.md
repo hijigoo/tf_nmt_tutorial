@@ -1,5 +1,5 @@
 # Tensorflow nmt tutorial
-##### A simple implementation of [Tensorflow nmt tutorial](https://github.com/tensorflow/nmt)
+A simple implementation of [Tensorflow nmt tutorial](https://github.com/tensorflow/nmt)
 
 ## 0. basic_model
 Basic seq2seq model<br>
